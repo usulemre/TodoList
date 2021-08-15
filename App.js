@@ -1,21 +1,54 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import React, { useState } from "react";
+import { View, FlatList, Button } from "react-native";
+
+import List from "./component/List";
+import GoalInput from "./component/GoalInput";
 
 export default function App() {
+  const [add, setadd] = useState([]);
+  const [oddMod, setoddMod] = useState(false);
+
+  const addHandler = (goltTitle) => {
+    setadd((currentGoals) => [
+      ...currentGoals,
+      {
+        id: Math.random().toString(),
+        value: goltTitle,
+      },
+    ]);
+    setoddMod(false);
+  };
+
+  const deleteHandler = (goalId) => {
+    setadd((currentGoals) => {
+      return currentGoals.filter((goal) => goal.id !== goalId);
+    });
+  };
+
+  const cancelHandler = () => {
+    setoddMod(false);
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View style={{ padding: 40, marginVertical: 10 }}>
+      <Button title="Yeni Ekle" onPress={() => setoddMod(true)} />
+      <GoalInput
+        visible={oddMod}
+        onAddGoal={addHandler}
+        onCancel={cancelHandler}
+      />
+      <FlatList
+        keyExtractor={(item, index) => item.id}
+        data={add}
+        renderItem={(itemData) => (
+          <List
+            id={itemData.item.id}
+            onDelete={deleteHandler}
+            title={itemData.item.value}
+          />
+        )}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
